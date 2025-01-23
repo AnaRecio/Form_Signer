@@ -12,15 +12,17 @@
       "status": 204
     },
     {
-      "source": "/(.*)",
+      "src": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "(?!form-signer.vercel.app)"
         }
       ],
-      "permanent": true,
-      "destination": "https://form-signer.vercel.app/$1"
+      "status": 301,
+      "headers": {
+        "Location": "https://form-signer.vercel.app/$1"
+      }
     },
     {
       "src": "/api/(.*)",
@@ -32,8 +34,7 @@
       "headers": {
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
-        "Expires": "0",
-        "Access-Control-Allow-Origin": "*"
+        "Expires": "0"
       }
     }
   ],
