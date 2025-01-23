@@ -12,19 +12,6 @@
       "status": 204
     },
     {
-      "src": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "(?!form-signer.vercel.app)"
-        }
-      ],
-      "status": 301,
-      "headers": {
-        "Location": "https://form-signer.vercel.app/$1"
-      }
-    },
-    {
       "src": "/api/(.*)",
       "dest": "src/index.js"
     },
@@ -36,25 +23,6 @@
         "Pragma": "no-cache",
         "Expires": "0"
       }
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        },
-        {
-          "key": "Pragma",
-          "value": "no-cache"
-        },
-        {
-          "key": "Expires",
-          "value": "0"
-        }
-      ]
     }
   ]
 } 
