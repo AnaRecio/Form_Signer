@@ -15,23 +15,38 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         try {
+            const loadingMessage = document.createElement('div');
+            loadingMessage.textContent = 'Processing... Please wait.';
+            loadingMessage.style.position = 'fixed';
+            loadingMessage.style.top = '50%';
+            loadingMessage.style.left = '50%';
+            loadingMessage.style.transform = 'translate(-50%, -50%)';
+            loadingMessage.style.padding = '20px';
+            loadingMessage.style.background = 'rgba(0,0,0,0.8)';
+            loadingMessage.style.color = 'white';
+            loadingMessage.style.borderRadius = '5px';
+            document.body.appendChild(loadingMessage);
+
             const photoInput = document.getElementById('idPhotos');
             const photos = [];
             
             // Comprimir cada imagen
             for (let file of photoInput.files) {
+                loadingMessage.textContent = `Compressing image ${photos.length + 1} of ${photoInput.files.length}...`;
                 const compressedImage = await compressImage(file);
                 photos.push(compressedImage);
             }
 
+            loadingMessage.textContent = 'Generating PDF...';
+
             const formData = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
-                signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL('image/jpeg', 0.7),
+                signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL('image/jpeg', 0.5),
                 photos: photos
             };
 
-            const response = await fetch('/generate-pdf', {
+            const response = await fetch('/api/generate-pdf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,9 +72,13 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 throw new Error('Failed to generate PDF');
             }
+
+            document.body.removeChild(loadingMessage);
         } catch (error) {
             console.error('Error:', error);
             alert('Error generating PDF: ' + error.message);
+            const loadingMessage = document.querySelector('div');
+            if (loadingMessage) document.body.removeChild(loadingMessage);
         }
     });
 
@@ -91,7 +110,7 @@ function fileToBase64(file) {
     });
 }
 
-function compressImage(file) {
+async function compressImage(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -100,8 +119,9 @@ function compressImage(file) {
             img.src = event.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
+                // Reducir tamaño máximo
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
                 let width = img.width;
                 let height = img.height;
 
@@ -121,7 +141,8 @@ function compressImage(file) {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7));
+                // Reducir calidad a 0.5 (50%)
+                resolve(canvas.toDataURL('image/jpeg', 0.5));
             };
         };
     });

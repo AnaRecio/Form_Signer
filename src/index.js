@@ -5,9 +5,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Aumentar límites
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+// Aumentar límites pero mantenerlos razonables
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
@@ -19,17 +19,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/generate-pdf', async (req, res) => {
+app.post('/api/generate-pdf', async (req, res) => {
     try {
-        console.log('Receiving PDF generation request...');
         const { name, email, signature, photos } = req.body;
-        
-        if (!name || !email) {
-            return res.status(400).json({
-                success: false,
-                message: 'Name and email are required'
-            });
-        }
 
         const doc = new PDFDocument();
         const chunks = [];
@@ -42,51 +34,37 @@ app.post('/generate-pdf', async (req, res) => {
             res.send(pdfData);
         });
 
-        // First page with personal information
+        // Agregar contenido al PDF
         doc.fontSize(18).text('Personal Information', { align: 'center' });
         doc.moveDown();
-        doc.fontSize(12).text(`Name: ${name}`, 100, 150);
-        doc.text(`Email: ${email}`, 100, 180);
+        doc.fontSize(12).text(`Name: ${name}`);
+        doc.text(`Email: ${email}`);
 
-        // Add signature if exists
         if (signature) {
-            doc.moveDown();
-            doc.text('Digital Signature:', 100, 220);
-            const signatureData = signature.replace(/^data:image\/\w+;base64,/, '');
-            const signatureBuffer = Buffer.from(signatureData, 'base64');
-            doc.image(signatureBuffer, 100, 240, { width: 200 });
+            doc.addPage();
+            doc.fontSize(14).text('Signature:', 50, 50);
+            const sigImg = Buffer.from(signature.split(',')[1], 'base64');
+            doc.image(sigImg, 50, 70, { width: 200 });
         }
 
-        // Add photos if they exist
         if (photos && photos.length > 0) {
             photos.forEach((photo, index) => {
                 doc.addPage();
                 doc.fontSize(14).text(`ID Photo ${index + 1}`, { align: 'center' });
-                doc.moveDown();
-                
-                try {
-                    const photoData = photo.replace(/^data:image\/\w+;base64,/, '');
-                    const photoBuffer = Buffer.from(photoData, 'base64');
-                    doc.image(photoBuffer, {
-                        fit: [500, 700],
-                        align: 'center',
-                        valign: 'center'
-                    });
-                } catch (err) {
-                    console.error(`Error processing photo ${index + 1}:`, err);
-                    doc.text(`Error loading photo ${index + 1}`, { align: 'center' });
-                }
+                const img = Buffer.from(photo.split(',')[1], 'base64');
+                doc.image(img, {
+                    fit: [500, 700],
+                    align: 'center',
+                    valign: 'center'
+                });
             });
         }
 
         doc.end();
 
-    } catch (err) {
-        console.error('Error generating PDF:', err);
-        res.status(500).json({
-            success: false,
-            message: 'Error generating PDF: ' + err.message
-        });
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).json({ error: 'Failed to generate PDF' });
     }
 });
 
