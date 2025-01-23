@@ -1,21 +1,16 @@
 const express = require('express');
 const PDFDocument = require('pdfkit');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Aumentar significativamente los límites
-app.use(express.json({
-    limit: '100mb',
-    extended: true,
-    parameterLimit: 50000
-}));
+// Aumentar límites
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-app.use(express.urlencoded({
-    limit: '100mb',
-    extended: true,
-    parameterLimit: 50000
-}));
+// Servir archivos estáticos
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Configurar headers CORS
 app.use((req, res, next) => {
@@ -23,8 +18,6 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
-
-app.use(express.static('public'));
 
 app.post('/generate-pdf', async (req, res) => {
     try {
@@ -100,10 +93,7 @@ app.post('/generate-pdf', async (req, res) => {
 // Manejo de errores
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: 'Error processing request: ' + err.message
-    });
+    res.status(500).send('Something broke!');
 });
 
 app.listen(PORT, () => {
