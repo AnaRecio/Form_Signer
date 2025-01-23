@@ -1,24 +1,39 @@
+/* Reset y variables */
+:root {
+    --primary-color: #2196F3;
+    --danger-color: #f44336;
+    --success-color: #4CAF50;
+    --background-color: #f5f5f5;
+}
+
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-color);
+}
+
+/* Container responsivo */
+.container {
     max-width: 800px;
+    width: 100%;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f5f5f5;
-}
-
-.container {
     background-color: white;
-    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
 
+/* Títulos responsivos */
 h1 {
     color: #333;
     text-align: center;
     margin-bottom: 30px;
+    font-size: clamp(24px, 5vw, 32px);
 }
 
+/* Grupos de formulario */
 .form-group {
     margin-bottom: 20px;
 }
@@ -30,77 +45,61 @@ label {
     font-weight: bold;
 }
 
+/* Inputs responsivos */
 input[type="text"],
-input[type="email"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
+input[type="email"],
 input[type="file"] {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background-color: white;
     box-sizing: border-box;
-    margin-bottom: 5px;
+    font-size: 16px;
 }
 
+/* Signature pad responsivo */
 .signature-container {
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .signature-pad-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
     border: 2px solid #ddd;
     border-radius: 4px;
-    margin-bottom: 10px;
     background-color: white;
-    display: inline-block;
-    width: 400px;
-    height: 200px;
 }
 
 #signature-pad {
     width: 100%;
-    height: 100%;
+    height: 200px;
     touch-action: none;
 }
 
+/* Botones responsivos */
 .signature-buttons {
     margin-top: 10px;
-}
-
-small {
-    display: block;
-    color: #666;
-    margin-top: 5px;
-    font-style: italic;
+    text-align: center;
 }
 
 button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-}
-
-button:hover {
-    background-color: #45a049;
+    transition: background-color 0.3s;
 }
 
 #clear-signature {
-    background-color: #f44336;
-    margin-left: 10px;
+    background-color: var(--danger-color);
+    color: white;
 }
 
 #clear-signature:hover {
-    background-color: #da190b;
+    background-color: #d32f2f;
 }
 
 .submit-container {
@@ -109,11 +108,65 @@ button:hover {
 }
 
 .submit-button {
-    background-color: #2196F3;
-    padding: 12px 30px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 14px 28px;
     font-size: 18px;
 }
 
 .submit-button:hover {
     background-color: #1976D2;
+}
+
+/* Mensajes de ayuda */
+small {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Media queries para diferentes dispositivos */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #clear-signature {
+        margin-left: 0;
+    }
+
+    .signature-pad-container {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="file"] {
+        padding: 10px;
+    }
+
+    .signature-pad-container {
+        height: 120px;
+    }
+
+    .submit-button {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
 } 
