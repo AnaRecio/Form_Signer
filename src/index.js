@@ -34,29 +34,39 @@ app.post('/api/generate-pdf', async (req, res) => {
             res.send(pdfData);
         });
 
-        // Agregar contenido al PDF
+        // Primera página con información personal y firma
         doc.fontSize(18).text('Personal Information', { align: 'center' });
         doc.moveDown();
-        doc.fontSize(12).text(`Name: ${name}`);
-        doc.text(`Email: ${email}`);
+        
+        // Información personal
+        doc.fontSize(12).text(`Name: ${name}`, 50, 150);
+        doc.text(`Email: ${email}`, 50, 180);
 
+        // Firma en la misma página
         if (signature) {
-            doc.addPage();
-            doc.fontSize(14).text('Signature:', 50, 50);
+            doc.fontSize(14).text('Signature:', 50, 250);
             const sigImg = Buffer.from(signature.split(',')[1], 'base64');
-            doc.image(sigImg, 50, 70, { width: 200 });
+            doc.image(sigImg, 50, 280, { width: 200 });
         }
 
+        // Fotos empiezan en la segunda página
         if (photos && photos.length > 0) {
             photos.forEach((photo, index) => {
                 doc.addPage();
                 doc.fontSize(14).text(`ID Photo ${index + 1}`, { align: 'center' });
-                const img = Buffer.from(photo.split(',')[1], 'base64');
-                doc.image(img, {
-                    fit: [500, 700],
-                    align: 'center',
-                    valign: 'center'
-                });
+                doc.moveDown();
+                
+                try {
+                    const img = Buffer.from(photo.split(',')[1], 'base64');
+                    doc.image(img, {
+                        fit: [500, 700],
+                        align: 'center',
+                        valign: 'center'
+                    });
+                } catch (error) {
+                    console.error(`Error processing photo ${index + 1}:`, error);
+                    doc.text(`Error loading photo ${index + 1}`, { align: 'center' });
+                }
             });
         }
 

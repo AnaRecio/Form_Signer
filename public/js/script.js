@@ -2,7 +2,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('signature-pad');
     const signaturePad = new SignaturePad(canvas, {
         backgroundColor: 'rgb(255, 255, 255)',
-        penColor: 'rgb(0, 0, 0)'
+        penColor: 'rgb(0, 0, 0)',
+        velocityFilterWeight: 0.7
+    });
+
+    // Ajustar el tamaño del canvas
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.clear();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Botones de foto
+    document.getElementById('takePhoto').addEventListener('click', () => {
+        document.getElementById('idPhotos').click();
+    });
+
+    document.getElementById('selectPhoto').addEventListener('click', () => {
+        const input = document.getElementById('idPhotos');
+        input.removeAttribute('capture');
+        input.click();
+        input.setAttribute('capture', 'environment');
+    });
+
+    // Preview de fotos
+    document.getElementById('idPhotos').addEventListener('change', function(e) {
+        const preview = document.getElementById('photo-preview');
+        preview.innerHTML = '';
+        
+        Array.from(this.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
     });
 
     // Limpiar firma
@@ -14,30 +55,23 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('form').addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        
         try {
-            const loadingMessage = document.createElement('div');
-            loadingMessage.textContent = 'Processing... Please wait.';
-            loadingMessage.style.position = 'fixed';
-            loadingMessage.style.top = '50%';
-            loadingMessage.style.left = '50%';
-            loadingMessage.style.transform = 'translate(-50%, -50%)';
-            loadingMessage.style.padding = '20px';
-            loadingMessage.style.background = 'rgba(0,0,0,0.8)';
-            loadingMessage.style.color = 'white';
-            loadingMessage.style.borderRadius = '5px';
-            document.body.appendChild(loadingMessage);
-
+            loadingOverlay.classList.remove('hidden');
+            
             const photoInput = document.getElementById('idPhotos');
             const photos = [];
             
             // Comprimir cada imagen
             for (let file of photoInput.files) {
-                loadingMessage.textContent = `Compressing image ${photos.length + 1} of ${photoInput.files.length}...`;
+                loadingText.textContent = `Compressing image ${photos.length + 1} of ${photoInput.files.length}...`;
                 const compressedImage = await compressImage(file);
                 photos.push(compressedImage);
             }
 
-            loadingMessage.textContent = 'Generating PDF...';
+            loadingText.textContent = 'Generating PDF...';
 
             const formData = {
                 name: document.getElementById('name').value,
@@ -73,29 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Failed to generate PDF');
             }
 
-            document.body.removeChild(loadingMessage);
+            loadingOverlay.classList.add('hidden');
         } catch (error) {
             console.error('Error:', error);
             alert('Error generating PDF: ' + error.message);
-            const loadingMessage = document.querySelector('div');
-            if (loadingMessage) document.body.removeChild(loadingMessage);
-        }
-    });
-
-    // Agregar esto después de la inicialización del signature pad
-    const fileInput = document.getElementById('idPhotos');
-    const selectedFiles = document.getElementById('selected-files');
-
-    fileInput.addEventListener('change', function(e) {
-        const files = Array.from(this.files);
-        if (files.length > 0) {
-            selectedFiles.style.display = 'block';
-            selectedFiles.innerHTML = files.map(file => 
-                `<div>${file.name}</div>`
-            ).join('');
-        } else {
-            selectedFiles.style.display = 'none';
-            selectedFiles.innerHTML = '';
+            loadingOverlay.classList.add('hidden');
         }
     });
 });
