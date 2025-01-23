@@ -12,6 +12,17 @@
       "status": 204
     },
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?!form-signer.vercel.app)"
+        }
+      ],
+      "permanent": true,
+      "destination": "https://form-signer.vercel.app/$1"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "src/index.js"
     },
