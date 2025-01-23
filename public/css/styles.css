@@ -59,14 +59,14 @@ input[type="file"] {
 
 /* Signature pad responsivo */
 .signature-container {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     width: 100%;
 }
 
 .signature-pad-container {
     width: 100%;
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto 15px;
     border: 2px solid #ddd;
     border-radius: 4px;
     background-color: white;
@@ -80,8 +80,10 @@ input[type="file"] {
 
 /* Botones responsivos */
 .signature-buttons {
-    margin-top: 10px;
+    margin-top: 15px;
     text-align: center;
+    clear: both;
+    padding: 10px 0;
 }
 
 button {
@@ -96,6 +98,10 @@ button {
 #clear-signature {
     background-color: var(--danger-color);
     color: white;
+    width: auto;
+    min-width: 120px;
+    margin: 0 auto;
+    display: inline-block;
 }
 
 #clear-signature:hover {
@@ -142,11 +148,21 @@ small {
     }
 
     #clear-signature {
-        margin-left: 0;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    .signature-container {
+        margin-bottom: 40px;
     }
 
     .signature-pad-container {
-        height: 150px;
+        margin-bottom: 20px;
+    }
+
+    .signature-buttons {
+        position: relative;
+        z-index: 1;
     }
 }
 
