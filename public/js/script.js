@@ -84,6 +84,23 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error generating PDF: ' + error.message);
         }
     });
+
+    // Agregar esto después de la inicialización del signature pad
+    const fileInput = document.getElementById('idPhotos');
+    const selectedFiles = document.getElementById('selected-files');
+
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(this.files);
+        if (files.length > 0) {
+            selectedFiles.style.display = 'block';
+            selectedFiles.innerHTML = files.map(file => 
+                `<div>${file.name}</div>`
+            ).join('');
+        } else {
+            selectedFiles.style.display = 'none';
+            selectedFiles.innerHTML = '';
+        }
+    });
 });
 
 // Función auxiliar para convertir archivo a base64

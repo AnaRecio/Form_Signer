@@ -22,17 +22,24 @@
                        placeholder="Enter your email">
             </div>
 
-            <div class="form-group">
+            <div class="form-group file-input-container">
                 <label for="idPhotos">ID Photos (Front and Back):</label>
-                <input type="file" id="idPhotos" name="idPhotos" 
-                       accept="image/*" multiple required>
-                <small>Select multiple photos by holding Ctrl (Cmd on Mac) while selecting</small>
+                <div class="file-input-wrapper">
+                    <input type="file" id="idPhotos" name="idPhotos" 
+                           accept="image/*" multiple required
+                           capture="environment">
+                    <div class="file-input-button">
+                        <span>Select Photos or Take Picture</span>
+                    </div>
+                </div>
+                <small>You can select multiple photos or take pictures directly</small>
+                <div id="selected-files"></div>
             </div>
 
             <div class="signature-container">
                 <label>Digital Signature:</label>
                 <div class="signature-pad-container">
-                    <canvas id="signature-pad" width="400" height="200"></canvas>
+                    <canvas id="signature-pad"></canvas>
                 </div>
                 <div class="signature-buttons">
                     <button type="button" id="clear-signature">Clear Signature</button>
