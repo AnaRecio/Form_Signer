@@ -2,12 +2,29 @@ const express = require('express');
 const PDFDocument = require('pdfkit');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Aumentar significativamente los límites
+app.use(express.json({
+    limit: '100mb',
+    extended: true,
+    parameterLimit: 50000
+}));
+
+app.use(express.urlencoded({
+    limit: '100mb',
+    extended: true,
+    parameterLimit: 50000
+}));
+
+// Configurar headers CORS
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
+
 app.use(express.static('public'));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.post('/generate-pdf', async (req, res) => {
     try {
@@ -80,6 +97,15 @@ app.post('/generate-pdf', async (req, res) => {
     }
 });
 
+// Manejo de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        message: 'Error processing request: ' + err.message
+    });
+});
+
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 }); 

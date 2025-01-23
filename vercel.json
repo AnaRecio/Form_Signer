@@ -19,5 +19,16 @@
       "src": "/(.*)",
       "dest": "public/$1"
     }
-  ]
+  ],
+  "functions": {
+    "src/index.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "protection": {
+    "files": [
+      "/**"
+    ]
+  }
 } 

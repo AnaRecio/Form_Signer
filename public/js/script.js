@@ -15,8 +15,21 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         try {
-            // Verificar si hay archivos seleccionados
             const photoInput = document.getElementById('idPhotos');
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            let totalSize = 0;
+
+            // Verificar tamaño total de las fotos
+            for (let file of photoInput.files) {
+                totalSize += file.size;
+            }
+
+            if (totalSize > maxSize) {
+                alert('Total file size is too large. Please select smaller images (max 50MB total).');
+                return;
+            }
+
+            // Verificar si hay archivos seleccionados
             if (!photoInput.files || photoInput.files.length === 0) {
                 alert('Please select at least one photo');
                 return;
